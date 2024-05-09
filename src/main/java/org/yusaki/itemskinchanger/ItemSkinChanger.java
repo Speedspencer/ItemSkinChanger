@@ -119,6 +119,10 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
         if (section != null && section.contains(customModelDataName)) {
             int customModelData = section.getInt(customModelDataName);
             ItemMeta meta = item.getItemMeta();
+            if (meta.getPersistentDataContainer().has(new NamespacedKey(this, "ownerUUID"), PersistentDataType.STRING) && !player.getUniqueId().toString().equals(meta.getPersistentDataContainer().get(new NamespacedKey(this, "ownerUUID"), PersistentDataType.STRING))) {
+                sendMessage(player, "NotOwner");
+                return;
+            }
             meta.setCustomModelData(customModelData);
             meta.getPersistentDataContainer().set(new NamespacedKey(this, "customModelDataName"), PersistentDataType.STRING, customModelDataName);
             meta.getPersistentDataContainer().set(new NamespacedKey(this, "ownerUUID"), PersistentDataType.STRING, player.getUniqueId().toString());
@@ -134,16 +138,21 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
 
         if (item.getType() == Material.AIR) {
             if (sendMessage) {
-                sendMessage(player, "customModelDataSet");
+                sendMessage(player, "mustHoldItem");
             }
             return;
         }
         if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData()) {
             ItemMeta meta = item.getItemMeta();
             meta.setCustomModelData(null);
-            if (clearOwner) {
+            if (clearOwner && player.getUniqueId().toString().equals(meta.getPersistentDataContainer().get(new NamespacedKey(this, "ownerUUID"), PersistentDataType.STRING))) {
                 meta.getPersistentDataContainer().remove(new NamespacedKey(this, "ownerUUID"));
                 meta.getPersistentDataContainer().remove(new NamespacedKey(this, "customModelDataName"));
+            }
+            else {
+                if (sendMessage) {
+                    sendMessage(player, "NotOwner");
+                }
             }
             item.setItemMeta(meta);
             player.getInventory().setItemInMainHand(item);

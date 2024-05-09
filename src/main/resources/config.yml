@@ -36,6 +36,7 @@ messages:
   customModelDataCleared: "&aCustom model data cleared for the item in your hand."
   customModelDataNoPermission: "&cYou do not have permission to set this custom model data."
   itemNoCustomModelData: "&cThe item in your hand does not have custom model data."
+  NotOwner: "&cYou are not the owner of this item."
   pluginReloaded: "&aPlugin and configuration reloaded."
 
 

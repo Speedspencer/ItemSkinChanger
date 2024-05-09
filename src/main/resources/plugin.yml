@@ -3,6 +3,8 @@ version: '${version}'
 main: org.yusaki.itemskinchanger.ItemSkinChanger
 api-version: '1.20'
 folia-supported: true
+author: Yusaki
+description: Change the Skin of Items with Custom Model Data with commands.
 
 commands:
   itsc:

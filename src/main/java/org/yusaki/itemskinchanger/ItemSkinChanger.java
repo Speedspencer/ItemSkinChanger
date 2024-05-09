@@ -6,13 +6,16 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.bukkit.ChatColor;
 
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,6 +26,8 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        updateConfig();
+        printConfig();
         getLogger().info("ItemSkinChanger has been enabled!");
         getServer().getPluginManager().registerEvents(new ItemOwnershipListener(this), this);
     }
@@ -149,6 +154,7 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
         }
     }
 
+
     void sendMessage(CommandSender sender, String message) {
         if (sender instanceof Player) {
             UUID playerId = ((Player) sender).getUniqueId();
@@ -162,6 +168,9 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
             // Update the time of the last message
             messageCooldowns.put(playerId, currentTime);
         }
+
+        // Translate color codes
+        message = ChatColor.translateAlternateColorCodes('&', message);
 
         sender.sendMessage(message);
     }
@@ -196,5 +205,61 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
         // Check if any key in the section matches the customModelDataName
         assert section != null;
         return section.getKeys(false).stream().anyMatch(key -> key.equalsIgnoreCase(customModelDataName));
+    }
+
+    public void updateConfig() {
+        reloadConfig();
+        // Load the default configuration from the JAR file
+        YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(Objects.requireNonNull(getResource("config.yml"))));
+
+        // Get the version of the default configuration
+        double defaultVersion = defaultConfig.getDouble("version");
+        if (getConfig().getBoolean("debug")){
+            getLogger().info("Plugin config version: " + defaultVersion);
+        }
+
+        // Get the version of the configuration on the file system
+        double currentVersion = getConfig().getDouble("version");
+        if (getConfig().getBoolean("debug")){
+            getLogger().info("Current config version: " + currentVersion);
+        }
+        // If the default configuration is newer
+        if (defaultVersion > currentVersion) {
+            // Add new values
+            if (getConfig().getBoolean("debug")){
+                getLogger().info("Config Version Mismatched, Updating config file...");
+            }
+            for (String key : defaultConfig.getKeys(true)) {
+                getLogger().info("Checking key: " + key);
+                if (!getConfig().isSet(key)) {
+                    if (getConfig().getBoolean("debug")) {
+                        getLogger().info("Missing Config, Adding new config value: " + key);
+                    }
+                    getConfig().set(key, defaultConfig.get(key));
+                } else {
+                    if (getConfig().getBoolean("debug")){
+                        getLogger().info("Config value already exists: " + key);
+                    }
+                }
+                // change the version to the default version
+                getConfig().set("version", defaultVersion);
+            }
+            // Save the configuration file
+            saveConfig();
+        }
+        else {
+            if (getConfig().getBoolean("debug")){
+                getLogger().info("Config file is up to date.");
+            }
+        }
+
+        // Reload the configuration file to get any changes
+        reloadConfig();
+    }
+
+    public void printConfig() {
+        for (String key : getConfig().getKeys(true)) {
+            getLogger().info(key + ": " + getConfig().get(key));
+        }
     }
 }

@@ -11,6 +11,9 @@ commands:
     tab-completion: true
 
 permissions:
+  itemskinchanger.reload:
+    description: Allows using reload command
+    default: op
   itemskinchanger.setmodeldata:
     description: Allows using /itsc set <modeldata> command
     default: op

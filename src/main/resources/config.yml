@@ -1,17 +1,31 @@
+# Config Version
+version: 1.0
+
+# debug messages
+debug: true
+
+# message prefix
+prefix: '&7[&6ItemSkinChanger&7] &r'
+
+#Skin Data
 customModelData:
   DIAMOND_SWORD:
     CoolSword: 1
     AnotherCoolSword: 2
-  IRON_SWORD:
-    YetAnotherCoolSword: 3
-    AndAnotherOne: 4
 
-# message prefix
-prefix: '&7[&6ItemSkinChanger&7] &r'
-# Error Show Permission
-errorShowPermission: true
+  # You can add more materials here
+  # Example:
+  # IRON_SWORD:
+  #   YetAnotherCoolSword: 3
+  #   AndAnotherOne: 4
 
-# debug messages
-debug: true
 # message cooldown for every message in seconds
 messageCooldown: 1
+
+# Error Show Permission Required Message
+errorShowPermission: true
+
+
+
+
+

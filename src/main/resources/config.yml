@@ -2,7 +2,7 @@
 version: 1.0
 
 # debug messages
-debug: true
+debug: false
 
 
 #Skin Data

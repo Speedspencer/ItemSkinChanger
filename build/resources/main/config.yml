@@ -5,3 +5,13 @@ customModelData:
   IRON_SWORD:
     YetAnotherCoolSword: 3
     AndAnotherOne: 4
+
+# message prefix
+prefix: '&7[&6ItemSkinChanger&7] &r'
+# Error Show Permission
+errorShowPermission: true
+
+# debug messages
+debug: true
+# message cooldown for every message in seconds
+messageCooldown: 1

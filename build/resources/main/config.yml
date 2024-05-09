@@ -1,0 +1,7 @@
+customModelData:
+  DIAMOND_SWORD:
+    CoolSword: 1
+    AnotherCoolSword: 2
+  IRON_SWORD:
+    YetAnotherCoolSword: 3
+    AndAnotherOne: 4

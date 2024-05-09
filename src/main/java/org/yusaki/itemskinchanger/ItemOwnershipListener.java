@@ -41,12 +41,12 @@ public class ItemOwnershipListener implements Listener {
                     if (customModelDataName != null) {
                         if (!plugin.hasCustomModelData(item, customModelDataName)) {
                             if (plugin.getConfig().getBoolean("debug")) {
-                                plugin.sendMessage(player, "Custom model data doesn't exist, please set again.");
+                                plugin.sendMessage(player, "customModelDataNotExist");
                             }
                             return;
                         }
                         if (plugin.getConfig().getBoolean("debug")) {
-                            plugin.sendMessage(player, "Setting custom model data to " + customModelDataName + " for the item in your hand.");
+                            plugin.sendMessage(player, "customModelDataSet", customModelDataName);
                         }
 
                         event.setCancelled(true);
@@ -55,7 +55,7 @@ public class ItemOwnershipListener implements Listener {
                     }
                     else {
                         if (plugin.getConfig().getBoolean("debug")) {
-                            plugin.sendMessage(entity, "The item in your hand does not have custom model data.");
+                            plugin.sendMessage(entity, "itemNoCustomModelData");
                         }
                     }
                 }

@@ -4,8 +4,6 @@ version: 1.0
 # debug messages
 debug: true
 
-# message prefix
-prefix: '&7[&6ItemSkinChanger&7] &r'
 
 #Skin Data
 customModelData:
@@ -25,6 +23,20 @@ messageCooldown: 1
 # Error Show Permission Required Message
 errorShowPermission: true
 
+# Messages
+messages:
+  prefix: "&7[&6ItemSkinChanger&7] &r"
+  noPermission: "&eYou do not have permission to use this command."
+  requiredPermission: "&cRequired permission: %s"
+  usage: "&eUsage: /itsc <subcommand> [arguments]"
+  invalidSubcommand: "&cInvalid subcommand. Use /itsc set <customModelDataName>, /itsc clear, or /itsc reload"
+  mustHoldItem: "&cYou must be holding an item to use this command."
+  customModelDataSet: "&aCustom model data set to %s for the item in your hand."
+  customModelDataNotExist: "&cThe custom model data does not exist for this item material."
+  customModelDataCleared: "&aCustom model data cleared for the item in your hand."
+  customModelDataNoPermission: "&cYou do not have permission to set this custom model data."
+  itemNoCustomModelData: "&cThe item in your hand does not have custom model data."
+  pluginReloaded: "&aPlugin and configuration reloaded."
 
 
 

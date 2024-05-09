@@ -27,7 +27,6 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
     public void onEnable() {
         saveDefaultConfig();
         updateConfig();
-        printConfig();
         getLogger().info("ItemSkinChanger has been enabled!");
         getServer().getPluginManager().registerEvents(new ItemOwnershipListener(this), this);
     }
@@ -46,10 +45,10 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
                     if (subcommand.equalsIgnoreCase("set")) {
                         if (!player.hasPermission("itemskinchanger.setmodeldata")) {
                             if (getConfig().getBoolean("errorShowPermission")){
-                                sendMessage(player, "Required permission: itemskinchanger.setmodeldata");
+                                sendMessage(player, "requiredPermission", "itemskinchanger.setmodeldata");
                                 return true;
                             }
-                            sendMessage(player, "You do not have permission to use this command.");
+                            sendMessage(player, "usage");
                             return true;
                         }
                         if (args.length == 2) {
@@ -59,38 +58,38 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
                             if (item.getType() != Material.AIR) {
                                 setCustomModelData(player, item, customModelDataName);
                             } else {
-                                sendMessage(player, "You must be holding an item to use this command.");
+                                sendMessage(player, "mustHoldItem");
                             }
                         } else {
-                            sendMessage(player, "Usage: /itsc set <customModelDataName>");
+                            sendMessage(player, "usage");
                         }
                     } else if (subcommand.equalsIgnoreCase("reload")) {
                         if (!player.hasPermission("itemskinchanger.reload")) {
                             if (getConfig().getBoolean("errorShowPermission")) {
-                                sendMessage(player, "Required permission: itemskinchanger.reload");
+                                sendMessage(player, "requiredPermission", "itemskinchanger.reload");
                                 return true;
                             }
-                            sendMessage(player, "You do not have permission to use this command.");
+                            sendMessage(player, "noPermission");
                             return true;
                         }
                         reloadPlugin();
-                        sendMessage(player, "Plugin and configuration reloaded.");
+                        sendMessage(player, "pluginReloaded");
                     } else if (subcommand.equalsIgnoreCase("clear")) {
                         if (!player.hasPermission("itemskinchanger.clearmodeldata")) {
                             if (getConfig().getBoolean("errorShowPermission")) {
-                                sendMessage(player, "Required permission: itemskinchanger.clearmodeldata");
+                                sendMessage(player, "requiredPermission", "itemskinchanger.clearmodeldata");
                                 return true;
                             }
-                            sendMessage(player, "You do not have permission to use this command.");
+                            sendMessage(player, "noPermission");
                             return true;
                         }
                         clearCustomModelData(player, true);
                     } else {
-                        sendMessage(player, "Invalid subcommand. Use /itsc set <customModelDataName>, /itsc clear, or /itsc reload");
+                        sendMessage(player, "invalidSubcommand");
                     }
 
                 } else {
-                    sendMessage(player, "Usage: /itsc <subcommand> [arguments]");
+                    sendMessage(player, "usage");
                 }
                 return true;
             }
@@ -107,9 +106,9 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
 
         // Check if the player has the required permission
         if (!player.hasPermission("itemskinchanger.setmodeldata." + materialName.toLowerCase() + "." + customModelDataName.toLowerCase())) {
-            sendMessage(player, "You do not have permission to set the custom model data for this item.");
+            sendMessage(player, "customModelDataNoPermission");
             if (getConfig().getBoolean("errorShowPermission")){
-                sendMessage(player, "Required permission: itemskinchanger.setmodeldata." + materialName.toLowerCase() + "." + customModelDataName.toLowerCase());
+                sendMessage(player, "requiredPermission", "itemskinchanger.setmodeldata." + materialName.toLowerCase() + "." + customModelDataName.toLowerCase());
             }
             return;
         }
@@ -125,9 +124,9 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
             meta.getPersistentDataContainer().set(new NamespacedKey(this, "ownerUUID"), PersistentDataType.STRING, player.getUniqueId().toString());
             item.setItemMeta(meta);
             player.getInventory().setItemInMainHand(item);
-            sendMessage(player, "Custom model data set to " + customModelDataName + " for the item in your hand.");
+            sendMessage(player, "customModelDataSet", customModelDataName);
         } else {
-            sendMessage(player, "The custom model data does not exist for this item material.");
+            sendMessage(player, "customModelDataNotExist");
         }
     }
 
@@ -135,7 +134,7 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
         ItemStack item = player.getInventory().getItemInMainHand();
         if (item.getType() == Material.AIR) {
             if (sendMessage) {
-                sendMessage(player, "You must be holding an item to use this command.");
+                sendMessage(player, "customModelDataSet");
             }
             return;
         }
@@ -147,15 +146,15 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
             item.setItemMeta(meta);
             player.getInventory().setItemInMainHand(item);
             if (sendMessage) {
-                sendMessage(player, "Custom model data cleared for the item in your hand.");
+                sendMessage(player, "customModelDataCleared");
             }
         } else if (sendMessage) {
-            sendMessage(player, "The item in your hand does not have custom model data.");
+            sendMessage(player, "itemNoCustomModelData");
         }
     }
 
 
-    void sendMessage(CommandSender sender, String message) {
+    void sendMessage(CommandSender sender, String key, Object... args) {
         if (sender instanceof Player) {
             UUID playerId = ((Player) sender).getUniqueId();
             long currentTime = System.currentTimeMillis();
@@ -169,10 +168,19 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
             messageCooldowns.put(playerId, currentTime);
         }
 
-        // Translate color codes
-        message = ChatColor.translateAlternateColorCodes('&', message);
+        // Retrieve the message from the configuration
+        String message = getConfig().getString("messages." + key);
+        String prefix = getConfig().getString("messages.prefix");
+        if (message != null && prefix != null) {
+            // Format the message with the provided arguments
+            message = String.format(message, args);
 
-        sender.sendMessage(message);
+            // Translate color codes
+            message = ChatColor.translateAlternateColorCodes('&', message);
+            prefix = ChatColor.translateAlternateColorCodes('&', prefix);
+
+            sender.sendMessage(prefix + message);
+        }
     }
 
     @Override
@@ -255,11 +263,5 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
 
         // Reload the configuration file to get any changes
         reloadConfig();
-    }
-
-    public void printConfig() {
-        for (String key : getConfig().getKeys(true)) {
-            getLogger().info(key + ": " + getConfig().get(key));
-        }
     }
 }

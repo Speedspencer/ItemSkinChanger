@@ -7,6 +7,7 @@ Item Skin Changer is a Minecraft plugin developed in Java using the Bukkit/Spigo
 - Set custom model data for items
 - Clear custom model data from items
 - Debug mode for developers
+- Handles item duplication issue when picked up by non-owner
 
 ## Commands
 
@@ -26,6 +27,10 @@ The `config.yml` file contains the following options:
 - `messageCooldown`: The minimum time in seconds between messages sent to the same player.
 - `errorShowPermission`: If true, the required permission will be shown when a player tries to set the custom model data without having the necessary permission.
 - `customModelData`: A section for each item material, containing the custom model data names and their corresponding values.
+
+## Handling Item Duplication
+
+When a player who is not the owner of an item picks it up, the plugin prevents the item from being duplicated. This is done by manually adding the item to the player's inventory and then removing the item entity from the world.
 
 ## Installation
 

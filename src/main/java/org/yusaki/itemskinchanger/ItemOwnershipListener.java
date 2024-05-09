@@ -32,7 +32,9 @@ public class ItemOwnershipListener implements Listener {
             if (ownerUUID != null) {
                 if (!player.getUniqueId().toString().equals(ownerUUID)) {
                     // If the player who picked up the item is not the owner, reset the skin to default
-                    plugin.clearCustomModelData(player, false);
+                    event.setCancelled(true);
+                    plugin.clearCustomModelData(player, item,false , true);
+                    event.getItem().remove();
                 } else {
                     // If the player who picked up the item is the owner, set the skin back to the custom skin
                     // You need to store the custom model data name in the item's metadata as well
@@ -59,19 +61,6 @@ public class ItemOwnershipListener implements Listener {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    @EventHandler
-    public void onPlayerDropItem(PlayerDropItemEvent event) {
-        ItemStack item = event.getItemDrop().getItemStack();
-        if (item.hasItemMeta()) {
-            ItemMeta meta = item.getItemMeta();
-            String ownerUUID = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "ownerUUID"), PersistentDataType.STRING);
-            if (ownerUUID != null && event.getPlayer().getUniqueId().toString().equals(ownerUUID)) {
-                // If the player who dropped the item is the owner, reset the skin to default
-                plugin.clearCustomModelData(event.getPlayer(), false);
             }
         }
     }

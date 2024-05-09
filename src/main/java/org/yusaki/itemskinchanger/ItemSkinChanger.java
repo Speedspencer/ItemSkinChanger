@@ -83,7 +83,7 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
                             sendMessage(player, "noPermission");
                             return true;
                         }
-                        clearCustomModelData(player, true);
+                        clearCustomModelData(player, player.getInventory().getItemInMainHand(),true, true);
                     } else {
                         sendMessage(player, "invalidSubcommand");
                     }
@@ -130,8 +130,8 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
         }
     }
 
-    void clearCustomModelData(Player player, boolean sendMessage) {
-        ItemStack item = player.getInventory().getItemInMainHand();
+    void clearCustomModelData(Player player,ItemStack item ,boolean clearOwner ,boolean sendMessage) {
+
         if (item.getType() == Material.AIR) {
             if (sendMessage) {
                 sendMessage(player, "customModelDataSet");
@@ -141,8 +141,10 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
         if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData()) {
             ItemMeta meta = item.getItemMeta();
             meta.setCustomModelData(null);
-            meta.getPersistentDataContainer().remove(new NamespacedKey(this, "ownerUUID"));
-            meta.getPersistentDataContainer().remove(new NamespacedKey(this, "customModelDataName"));
+            if (clearOwner) {
+                meta.getPersistentDataContainer().remove(new NamespacedKey(this, "ownerUUID"));
+                meta.getPersistentDataContainer().remove(new NamespacedKey(this, "customModelDataName"));
+            }
             item.setItemMeta(meta);
             player.getInventory().setItemInMainHand(item);
             if (sendMessage) {
@@ -154,7 +156,7 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
     }
 
 
-    void sendMessage(CommandSender sender, String key, Object... args) {
+    void sendMessage(CommandSender sender, String key ,Object... args) {
         if (sender instanceof Player) {
             UUID playerId = ((Player) sender).getUniqueId();
             long currentTime = System.currentTimeMillis();
@@ -180,6 +182,8 @@ public final class ItemSkinChanger extends JavaPlugin implements TabCompleter {
             prefix = ChatColor.translateAlternateColorCodes('&', prefix);
 
             sender.sendMessage(prefix + message);
+        } else {
+            sender.sendMessage("Raw message: " + key);
         }
     }
 
